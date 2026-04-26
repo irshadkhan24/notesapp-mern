@@ -31,7 +31,7 @@ router.get('/', middleware, async (req, res) => {
         return res.status(500).json({success: false, message: "Cant retrive notes"})
     }
 })
-router.put("/:id", async (req, res) => {
+router.put("/:id", middleware, async (req, res) => {
      try {
         const {id} = req.params;
         const updateNote = await Note.findByIdAndUpdate(id, req.body)
@@ -42,7 +42,7 @@ router.put("/:id", async (req, res) => {
 })
 
 // delete concepts
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", middleware, async (req, res) => {
      try {
         const {id} = req.params;
         const updateNote = await Note.findByIdAndDelete(id)

@@ -1,142 +1,171 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import NoteModal from '../components/NoteModal'
 import axios from 'axios'
 import NoteCard from '../components/NoteCard'
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify'
 
 const Home = () => {
   const [isModalOpen, setModalOpen] = useState(false)
-  const [filteredNotes, setFilteredNote] = useState(false)
+  const [filteredNotes, setFilteredNote] = useState([])
   const [notes, setNotes] = useState([])
-  const [currentNote, setCurrentNote] = useState(null)    //edit concepts
+  const [currentNote, setCurrentNote] = useState(null)
   const [query, setQuery] = useState('')
 
-  //concepts of displaying notes on portal
   useEffect(() => {
-
     fetchNotes()
   }, [])
 
   useEffect(() => {
     setFilteredNote(
-      notes.filter((note) => 
+      notes.filter((note) =>
         note.title.toLowerCase().includes(query.toLowerCase()) ||
         note.description.toLowerCase().includes(query.toLowerCase())
       )
-    );
-
-  }, [query, notes]);
+    )
+  }, [query, notes])
 
   const fetchNotes = async () => {
-  try {
-    const { data } = await axios.get("http://localhost:5000/api/note", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    setNotes(data.notes);
-  } catch (error) {
-    console.log(error);
+    try {
+      const { data } = await axios.get("http://localhost:5000/api/note", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      setNotes(data.notes)
+    } catch (error) {
+      console.log(error)
+    }
   }
-};
-
 
   const closeModal = () => {
     setModalOpen(false)
+    setCurrentNote(null)
   }
-/* created function edit concepts*/
+
   const onEdit = (note) => {
     setCurrentNote(note)
     setModalOpen(true)
-
   }
 
-  //Add new note calls and functions, edit not concepts 
   const addNote = async (title, description) => {
     try {
-            const response = await axios.post("http://localhost:5000/api/note/add", 
-                { title, description }, {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                  }
-                }
-            ); 
-             if(response.data.success) {
-                fetchNotes()
-                closeModal() /* it is custom function and define component (or its parent) to hide or close a modal dialog */
-            }
-        } catch(error) {
-          console.log(error)
-            
+      const response = await axios.post(
+        "http://localhost:5000/api/note/add",
+        { title, description },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
+      )
+
+      if (response.data.success) {
+        fetchNotes()
+        closeModal()
+        toast.success("Note Added 🚀")
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  //delete note calls and functions, edit delete note concepts 
   const deleteNote = async (id) => {
-      try {
-            const response = await axios.delete(`http://localhost:5000/api/note/${id}`, 
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                }
-            ); 
-             if(response.data.success) {
-                fetchNotes();
-                toast.success("note deleted")
-            }
-        } catch(error) {
-          console.log(error)
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/note/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
+      )
+
+      if (response.data.success) {
+        fetchNotes()
+        toast.success("Note Deleted 🗑️")
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const editNote = async (id, title, description) => {
     try {
-            const response = await axios.put(`http://localhost:5000/api/note/${id}`, 
-                { title, description }, {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                  }
-                }
-            ); 
-             if(response.data.success) {
-                fetchNotes()
-                closeModal() /* it is custom function and define component (or its parent) to hide or close a modal dialog */
-            }
-        } catch(error) {
-          console.log(error)
+      const response = await axios.put(
+        `http://localhost:5000/api/note/${id}`,
+        { title, description },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
+      )
+
+      if (response.data.success) {
+        fetchNotes()
+        closeModal()
+        toast.success("Note Updated ✏️")
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
-    <div className='bg-gray-100 min-h-screen'>
-      <Navbar setQuery={setQuery}/>
-      <div className="px-8 pt-4 grid grid-cols-1 md:grid-cols-3 gap-5">
-        { filteredNotes.length > 0 ? filteredNotes.map(note => (
-          <NoteCard 
-              key={note._id}
-              note={note}
-              onEdit={onEdit}
-              deleteNote={deleteNote}
-          />
-        )) : <p>No notes</p>}
+    <div className='min-h-screen bg-gradient-to-br from-gray-100 to-gray-200'>
+      
+      <Navbar setQuery={setQuery} />
+
+      {/* Header */}
+      <div className='px-8 pt-6'>
+        <h1 className='text-3xl font-bold text-gray-800'>My Notes</h1>
+        <p className='text-gray-500 mt-1'>Manage your thoughts efficiently ✨</p>
       </div>
 
-      <button 
-      onClick={() => setModalOpen(true)}
-      className='fixed right-4 bottom-4 text-2xl bg-teal-500 text-white font-bold p-4 rounded-full'>
+      {/* Notes Grid */}
+      <div className="px-8 py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredNotes.length > 0 ? (
+          filteredNotes.map(note => (
+            <div 
+              key={note._id}
+              className='transform hover:scale-105 transition duration-300'
+            >
+              <NoteCard 
+                note={note}
+                onEdit={onEdit}
+                deleteNote={deleteNote}
+              />
+            </div>
+          ))
+        ) : (
+          <div className='col-span-full flex flex-col items-center justify-center mt-20'>
+            <h2 className='text-xl font-semibold text-gray-600'>No Notes Found</h2>
+            <p className='text-gray-400 mt-2'>Start by adding a new note ✍️</p>
+          </div>
+        )}
+      </div>
+
+      {/* Floating Add Button */}
+      <button
+        onClick={() => setModalOpen(true)}
+        className='fixed bottom-6 right-6 bg-gradient-to-r from-teal-500 to-green-500 
+        text-white text-3xl w-14 h-14 rounded-full shadow-lg flex items-center 
+        justify-center hover:scale-110 hover:shadow-2xl transition duration-300'>
         +
       </button>
-      {isModalOpen && <NoteModal closeModal={closeModal}
-      addNote={addNote}
-      currentNote={currentNote}  /* pass modal*/
-      editNote={editNote}
-      />}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <NoteModal
+          closeModal={closeModal}
+          addNote={addNote}
+          currentNote={currentNote}
+          editNote={editNote}
+        />
+      )}
     </div>
   )
 }
 
 export default Home
-
-

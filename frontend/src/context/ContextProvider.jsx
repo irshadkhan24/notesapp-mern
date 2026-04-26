@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useState} from 'react'
 import { useEffect } from 'react'
-
+import axios from 'axios';
 
 const authContext = createContext()
 
@@ -17,24 +17,34 @@ const ContextProvider = ({children}) => {
     }
 
     useEffect(() => {
-      const verifyUser = async () => {
-        try{
-          const res = await axios.get('http://localhost:5000/api/auth/verify', {
-            headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  }
-          })
-          if(res.data.success) {
-            setUser(res.data.user)
-          } else [
-            setUser(null)
-          ]
-        }catch(error) {
-          console.log(error)
+  const verifyUser = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return; // 🔥 THIS LINE FIXES 401
+
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/auth/verify",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+
+      if (res.data.success) {
+        setUser(res.data.user);
+      } else {
+        setUser(null);
       }
-      verifyUser()
-    }, [])
+    } catch (error) {
+      console.log(error);
+      setUser(null);
+    }
+  };
+
+  verifyUser();
+}, []);
 
   return (
     <authContext.Provider value={{user, login, logout}}>
