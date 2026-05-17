@@ -45,7 +45,11 @@ router.post('/login', async (req,res) => {
         }
 
         /* Generte tokens */
-        const token = jwt.sign({id: user._id}, "secretkeyofnoteapp123@#", { expiresIn: "5h"})
+        const token = jwt.sign(
+  { id: user._id },
+  process.env.JWT_SECRET,
+  { expiresIn: "5h" }
+)
 
         return res.status(200).json({success: true, token, user: {name: user.name}, message: "Login Successfully"})
 
