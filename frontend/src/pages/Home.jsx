@@ -51,7 +51,7 @@ const Home = () => {
   const addNote = async (title, description) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/note/add",
+        `${import.meta.env.VITE_API_URL}/api/note/add`,
         { title, description },
         {
           headers: {
@@ -73,7 +73,7 @@ const Home = () => {
   const deleteNote = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/note/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/note/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -93,7 +93,7 @@ const Home = () => {
   const editNote = async (id, title, description) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/note/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/note/${id}`,
         { title, description },
         {
           headers: {
