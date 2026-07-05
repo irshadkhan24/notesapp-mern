@@ -2,12 +2,12 @@ import React, {useState} from 'react';
 import axios from "axios";
 import {Link, useNavigate} from "react-router-dom";
 import { useAuth } from '../context/ContextProvider';
-//import {FiEye, FiEyeOff} from 'react-icons/fi';  // Eye icons
+import {FiEye, FiEyeOff} from 'react-icons/fi';  // Eye icons
 
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    //const [showPassword, setShowPassword] = useState('')   // State for toggle
+    const [showPassword, setShowPassword] = useState('')   // State for toggle
     const navigate = useNavigate()
     const {login} = useAuth()
 
@@ -44,12 +44,23 @@ const Login = () => {
         className="w-full mb-4 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
       />
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full mb-2 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-      />
+     <div className="relative mb-2">
+  <input
+    type={showPassword ? "text" : "password"}
+    placeholder="Password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-12"
+  />
+
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+  >
+    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+  </button>
+</div>
 
       <div className="text-right mb-4">
         <Link to="/forgot-password" className="text-sm text-indigo-500 hover:underline">
