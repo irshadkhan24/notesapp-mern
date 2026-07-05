@@ -87,29 +87,29 @@ router.post("/forgot-password", async (req, res) => {
 
     await user.save();
 
-  const transporter = nodemailer.createTransport({
-  service: "gmail",
+   const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
-await transporter.verify();
-console.log("SMTP Connected");
+    const link = `https://notesapp-mern-woad.vercel.app/reset/${token}`;
 
-const link = `https://notesapp-mern-woad.vercel.app/reset/${token}`;
-
-const info = await transporter.sendMail({
-  from: process.env.EMAIL_USER,
-  to: user.email,
-  subject: "Password Reset",
-  html: `
-    <h3>Password Reset</h3>
-    <p>Click below link to reset password:</p>
-    <a href="${link}">${link}</a>
-  `,
-});
+    // ✅ FIXED MAIL
+    const info = await transporter.sendMail({
+      from: "rjcirshadkhan12sci624@gmail.com",
+      to: user.email,
+      subject: "Password Reset",
+      html: `
+        <h3>Password Reset</h3>
+        <p>Click below link to reset password:</p>
+        <a href="${link}">${link}</a>
+      `,
+    });
 
     console.log("Mail Sent:", info); // DEBUG
 
